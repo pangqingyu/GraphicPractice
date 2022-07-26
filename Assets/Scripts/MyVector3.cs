@@ -28,4 +28,14 @@ public struct MyVector3
     {
         return new MyVector3(a.x - b.x, a.y - b.y, a.z - b.z);
     }
+
+    public static MyVector3 operator *(MyVector3 a, float d)
+    {
+        return new MyVector3(a.x * d, a.y * d, a.z * d);
+    }
+
+    public static MyVector3 operator /(MyVector3 a, float d)
+    {
+        return new MyVector3(a.x / d, a.y / d, a.z / d);
+    }
 }
