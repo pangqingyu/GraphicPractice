@@ -1,9 +1,82 @@
+using UnityEngine;
+
 public struct MyMatrix4x4
 {
     public float m00, m01, m02, m03;
     public float m10, m11, m12, m13;
     public float m20, m21, m22, m23;
     public float m30, m31, m32, m33;
+
+    private static readonly MyMatrix4x4 identityMatrix = new MyMatrix4x4(1f, 0f, 0f, 0f, 0f, 1f, 0f, 0f, 0f, 0f, 1f, 0f, 0f, 0f, 0f, 1f);
+
+    public MyMatrix4x4(float m00, float m01, float m02, float m03,
+        float m10, float m11, float m12, float m13,
+        float m20, float m21, float m22, float m23,
+        float m30, float m31, float m32, float m33)
+    {
+        this.m00 = m00;
+        this.m01 = m01;
+        this.m02 = m02;
+        this.m03 = m03;
+        this.m10 = m10;
+        this.m11 = m11;
+        this.m12 = m12;
+        this.m13 = m13;
+        this.m20 = m20;
+        this.m21 = m21;
+        this.m22 = m22;
+        this.m23 = m23;
+        this.m30 = m30;
+        this.m31 = m31;
+        this.m32 = m32;
+        this.m33 = m33;
+    }
+
+    public static MyMatrix4x4 FromScale(MyVector3 s)
+    {
+        MyMatrix4x4 result = identityMatrix;
+        result.m00 = s.x;
+        result.m11 = s.y;
+        result.m22 = s.z;
+        return result;
+    }
+
+    public static MyMatrix4x4 FromPosition(MyVector3 pos)
+    {
+        MyMatrix4x4 result = identityMatrix;
+        result.m03 = pos.x;
+        result.m13 = pos.y;
+        result.m23 = pos.z;
+        return result;
+    }
+
+    public static MyMatrix4x4 FromRotation(MyVector3 r)
+    {
+        r *= Mathf.Deg2Rad;
+        MyMatrix4x4 rx = identityMatrix;
+        rx.m11 = Mathf.Cos(r.x);
+        rx.m12 = -Mathf.Sin(r.x);
+        rx.m21 = Mathf.Sin(r.x);
+        rx.m22 = Mathf.Cos(r.x);
+
+        MyMatrix4x4 ry = identityMatrix;
+        ry.m00 = Mathf.Cos(r.y);
+        ry.m02 = Mathf.Sin(r.y);
+        ry.m20 = -Mathf.Sin(r.y);
+        ry.m22 = Mathf.Cos(r.y);
+
+        MyMatrix4x4 rz = identityMatrix;
+        rz.m00 = Mathf.Cos(r.z);
+        rz.m01 = -Mathf.Sin(r.z);
+        rz.m10 = Mathf.Sin(r.z);
+        rz.m11 = Mathf.Cos(r.z);
+        return rx * ry * rz;
+    }
+
+    public static MyMatrix4x4 TRS(MyVector3 pos, MyVector3 r, MyVector3 s)
+    {
+        return FromPosition(pos) * FromRotation(r) * FromScale(s);
+    }
 
     public static MyMatrix4x4 operator *(MyMatrix4x4 lhs, MyMatrix4x4 rhs)
     {
