@@ -22,6 +22,7 @@ public class Test : MonoBehaviour
         bool flag;
         Vector3 vector3a, vector3b, vector3c;
         MyVector3 myVector3a, myVector3b, myVector3c;
+        float value;
 
         #region Check Vector3 MyVector3
 
@@ -52,10 +53,20 @@ public class Test : MonoBehaviour
         flag = vector3c.MyEquals(myVector3c) && myVector3c.MyEquals(vector3c);
         DebugCheck("myVector3 Cross", flag);
 
+        value = Random.Range(0f, 1);
+        vector3c = vector3a * value;
+        myVector3c = myVector3a * value;
+        flag = vector3c.MyEquals(myVector3c) && myVector3c.MyEquals(vector3c);
+        DebugCheck("myVector3 multiply float", flag);
+
+        vector3c = vector3b / value;
+        myVector3c = myVector3b / value;
+        flag = vector3c.MyEquals(myVector3c) && myVector3c.MyEquals(vector3c);
+        DebugCheck("myVector3 divide float", flag);
+
         #endregion
 
-        #region Check Vector4 MyVector4
-
+        #region Check Matrix4x4 MyMatrix4x4
 
 
         #endregion
