@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEngine;
 
-public class Test : MonoBehaviour
+public class TestFunc3 : MonoBehaviour
 {
     void Start()
     {
