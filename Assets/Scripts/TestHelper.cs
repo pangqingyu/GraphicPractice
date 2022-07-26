@@ -93,4 +93,49 @@ public static class TestHelper
         result.m33 = matrix4X4.m33;
         return result;
     }
+
+    public static bool Approximately(float a, float b)
+    {
+        return Mathf.Abs(a - b) < 1e-5f;
+    }
+
+    public static bool MyEquals(this Matrix4x4 m1, MyMatrix4x4 m2)
+    {
+        return Approximately(m1.m00, m2.m00)
+            && Approximately(m1.m01, m2.m01)
+            && Approximately(m1.m02, m2.m02)
+            && Approximately(m1.m03, m2.m03)
+            && Approximately(m1.m10, m2.m10)
+            && Approximately(m1.m11, m2.m11)
+            && Approximately(m1.m12, m2.m12)
+            && Approximately(m1.m13, m2.m13)
+            && Approximately(m1.m20, m2.m20)
+            && Approximately(m1.m21, m2.m21)
+            && Approximately(m1.m22, m2.m22)
+            && Approximately(m1.m23, m2.m23)
+            && Approximately(m1.m30, m2.m30)
+            && Approximately(m1.m31, m2.m31)
+            && Approximately(m1.m32, m2.m32)
+            && Approximately(m1.m33, m2.m33);
+    }
+
+    public static bool MyEquals(this MyMatrix4x4 m1, Matrix4x4 m2)
+    {
+        return Approximately(m1.m00, m2.m00)
+            && Approximately(m1.m01, m2.m01)
+            && Approximately(m1.m02, m2.m02)
+            && Approximately(m1.m03, m2.m03)
+            && Approximately(m1.m10, m2.m10)
+            && Approximately(m1.m11, m2.m11)
+            && Approximately(m1.m12, m2.m12)
+            && Approximately(m1.m13, m2.m13)
+            && Approximately(m1.m20, m2.m20)
+            && Approximately(m1.m21, m2.m21)
+            && Approximately(m1.m22, m2.m22)
+            && Approximately(m1.m23, m2.m23)
+            && Approximately(m1.m30, m2.m30)
+            && Approximately(m1.m31, m2.m31)
+            && Approximately(m1.m32, m2.m32)
+            && Approximately(m1.m33, m2.m33);
+    }
 }

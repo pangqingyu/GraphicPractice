@@ -70,7 +70,7 @@ public struct MyMatrix4x4
         rz.m01 = -Mathf.Sin(r.z);
         rz.m10 = Mathf.Sin(r.z);
         rz.m11 = Mathf.Cos(r.z);
-        return rx * ry * rz;
+        return ry * rx * rz;
     }
 
     public static MyMatrix4x4 TRS(MyVector3 pos, MyVector3 r, MyVector3 s)
