@@ -79,6 +79,14 @@ public struct MyMatrix4x4
         return FromPosition(pos) * FromRotation(r) * FromScale(s);
     }
 
+    public static MyMatrix4x4 FromTransform(Transform t)
+    {
+        MyVector3 pos = t.position.ToMyVector3();
+        MyVector3 r = t.eulerAngles.ToMyVector3();
+        MyVector3 s = t.localScale.ToMyVector3();
+        return TRS(pos, r, s);
+    }
+
     public static MyMatrix4x4 operator *(MyMatrix4x4 lhs, MyMatrix4x4 rhs)
     {
         MyMatrix4x4 result;

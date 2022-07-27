@@ -3,7 +3,7 @@ using UnityEngine;
 [RequireComponent(typeof(MyCamera), typeof(Camera))]
 public class TestFunc4 : MonoBehaviour
 {
-    Camera camera;
+    new Camera camera;
     MyCamera myCamera;
 
     void Awake()

@@ -12,6 +12,8 @@ public class MyCamera : MonoBehaviour
 
     [SerializeField]
     RawImage rawImage;
+    [SerializeField]
+    Transform myMeshTran;
     Texture2D target;
 
     void Awake()
@@ -30,12 +32,25 @@ public class MyCamera : MonoBehaviour
 
     void Update()
     {
-        Color color = Random.ColorHSV();
+        MyMatrix4x4 mvp = GetProjectionMatrix() * GetViewMatrix() * MyMatrix4x4.FromTransform(myMeshTran);
+        MyVector3 screenPoint = mvp.MultiplyPoint(new MyVector3());
+        bool needShow = Mathf.Abs(screenPoint.x) <= 1
+                     && Mathf.Abs(screenPoint.y) <= 1
+                     && Mathf.Abs(screenPoint.z) <= 1;
+        screenPoint.x += 1;
+        screenPoint.x /= 2;
+        screenPoint.y += 1;
+        screenPoint.y /= 2;
+        int x = Mathf.RoundToInt(screenPoint.x * ScreenWidth);
+        int y = Mathf.RoundToInt(screenPoint.y * ScreenHeight);
         for (int i = 0; i < ScreenWidth; i++)
         {
             for (int j = 0; j < ScreenHeight; j++)
             {
-                target.SetPixel(i, j, color);
+                if (needShow && Mathf.Abs(i - x) + Mathf.Abs(j - y) < 10)
+                    target.SetPixel(i, j, Color.white);
+                else
+                    target.SetPixel(i, j, Color.grey);
             }
         }
         target.Apply();
