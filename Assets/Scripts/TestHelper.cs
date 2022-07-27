@@ -96,7 +96,7 @@ public static class TestHelper
 
     public static bool Approximately(float a, float b)
     {
-        return Mathf.Abs(a - b) < 1e-5f;
+        return Mathf.Abs(a - b) < 1e-4f;
     }
 
     public static bool MyEquals(this Matrix4x4 m1, MyMatrix4x4 m2)

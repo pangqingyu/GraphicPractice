@@ -8,6 +8,7 @@ public struct MyMatrix4x4
     public float m30, m31, m32, m33;
 
     private static readonly MyMatrix4x4 identityMatrix = new MyMatrix4x4(1f, 0f, 0f, 0f, 0f, 1f, 0f, 0f, 0f, 0f, 1f, 0f, 0f, 0f, 0f, 1f);
+    public static MyMatrix4x4 identity => identityMatrix;
 
     public MyMatrix4x4(float m00, float m01, float m02, float m03,
         float m10, float m11, float m12, float m13,
