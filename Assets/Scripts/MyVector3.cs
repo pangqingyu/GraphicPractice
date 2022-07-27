@@ -7,6 +7,18 @@ public struct MyVector3
         this.x = x; this.y = y; this.z = z;
     }
 
+    private static readonly MyVector3 zeroVector = new MyVector3(0f, 0f, 0f);
+    public static MyVector3 zero => zeroVector;
+
+    private static readonly MyVector3 rightVector = new MyVector3(1f, 0f, 0f);
+    public static MyVector3 right => rightVector;
+
+    private static readonly MyVector3 upVector = new MyVector3(0f, 1f, 0f);
+    public static MyVector3 up => upVector;
+
+    private static readonly MyVector3 forwardVector = new MyVector3(0f, 0f, 1f);
+    public static MyVector3 forward => forwardVector;
+
     public static float Dot(MyVector3 lhs, MyVector3 rhs)
     {
         return lhs.x * rhs.x + lhs.y * rhs.y + lhs.z * rhs.z;
