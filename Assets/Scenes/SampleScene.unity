@@ -156,7 +156,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   nearClipPlane: 0
   farClipPlane: 0
-  fov: 0
+  verticalFov: 0
+  ScreenWidth: 1600
+  ScreenHeight: 900
   src: {fileID: 2800000, guid: ec11bbe508729524ca0bba6f33b493a0, type: 3}
   rawImage: {fileID: 1198676867}
 --- !u!4 &146379111
@@ -208,8 +210,8 @@ Camera:
     y: 0
     width: 1
     height: 1
-  near clip plane: 0.3
-  far clip plane: 1000
+  near clip plane: 1
+  far clip plane: 5
   field of view: 60
   orthographic: 0
   orthographic size: 5

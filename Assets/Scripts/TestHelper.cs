@@ -50,6 +50,8 @@ public static class TestHelper
 
     #endregion
 
+    #region Matrix4x4
+
     public static MyMatrix4x4 ToMyMatrix4x4(this Matrix4x4 matrix4X4)
     {
         MyMatrix4x4 result;
@@ -96,7 +98,7 @@ public static class TestHelper
 
     public static bool Approximately(float a, float b)
     {
-        return Mathf.Abs(a - b) < 1e-4f;
+        return Mathf.Abs(a - b) < 2e-4f * (Mathf.Max(1, Mathf.Abs(a), Mathf.Abs(b)));
     }
 
     public static bool MyEquals(this Matrix4x4 m1, MyMatrix4x4 m2)
@@ -138,4 +140,6 @@ public static class TestHelper
             && Approximately(m1.m32, m2.m32)
             && Approximately(m1.m33, m2.m33);
     }
+
+    #endregion
 }
