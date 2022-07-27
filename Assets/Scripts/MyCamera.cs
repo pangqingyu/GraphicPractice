@@ -11,13 +11,34 @@ public class MyCamera : MonoBehaviour
     float Aspect => (float)ScreenWidth / ScreenHeight;
 
     [SerializeField]
-    Texture2D src;
-    [SerializeField]
     RawImage rawImage;
+    Texture2D target;
 
     void Awake()
     {
-        rawImage.texture = src;
+        target = new Texture2D(ScreenWidth, ScreenHeight, TextureFormat.RGBA32, false);
+        rawImage.texture = target;
+        if (TryGetComponent<Camera>(out var cam))
+        {
+            cam.enabled = false;
+            cam.orthographic = false;
+            cam.nearClipPlane = nearClipPlane;
+            cam.farClipPlane = farClipPlane;
+            cam.fieldOfView = verticalFov;
+        }
+    }
+
+    void Update()
+    {
+        Color color = Random.ColorHSV();
+        for (int i = 0; i < ScreenWidth; i++)
+        {
+            for (int j = 0; j < ScreenHeight; j++)
+            {
+                target.SetPixel(i, j, color);
+            }
+        }
+        target.Apply();
     }
 
     public MyMatrix4x4 GetViewMatrix()
