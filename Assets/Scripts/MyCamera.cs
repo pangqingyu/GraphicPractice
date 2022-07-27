@@ -13,8 +13,12 @@ public class MyCamera : MonoBehaviour
     [SerializeField]
     RawImage rawImage;
     [SerializeField]
-    Transform myMeshTran;
+    Color clearColor = Color.gray;
+    [SerializeField]
+    MyMesh myMesh;
+
     Texture2D target;
+    MyMatrix4x4 mvp;
 
     void Awake()
     {
@@ -30,30 +34,109 @@ public class MyCamera : MonoBehaviour
         }
     }
 
+    bool CheckVertex(Vertex vertex)
+    {
+        MyVector4 v = vertex.posInClipSpace.vertex;
+        return -v.w < v.x && v.x < v.w
+            && -v.w < v.y && v.y < v.w
+            && 0 < v.z && v.z < v.w;
+    }
+
+    bool CheckTriangle(MyTriangle triangle)
+    {
+        return CheckVertex(triangle.p1)
+            && CheckVertex(triangle.p2)
+            && CheckVertex(triangle.p3);
+    }
+
+    void DrawMesh()
+    {
+        for (int i = 0; i < myMesh.triangles.Length; i += 3)
+        {
+            MyTriangle myTriangle = new MyTriangle
+            {
+                p1 = new Vertex
+                {
+                    posInObjectSpace = new Appdata(myMesh.vertices[i], myMesh.uvs[i])
+                },
+                p2 = new Vertex
+                {
+                    posInObjectSpace = new Appdata(myMesh.vertices[i + 1], myMesh.uvs[i + 1])
+                },
+                p3 = new Vertex
+                {
+                    posInObjectSpace = new Appdata(myMesh.vertices[i + 2], myMesh.uvs[i + 2])
+                }
+            };
+            DrawTriangle(myTriangle);
+        }
+    }
+
+    MyVector4 CalPosInScreenSpace(MyVector4 vertex)
+    {
+        vertex /= vertex.w;
+        vertex.x = 0.5f * (vertex.x + 1) * ScreenWidth;
+        vertex.y = 0.5f * (vertex.y + 1) * ScreenHeight;
+        vertex.z = 0.5f * (farClipPlane - nearClipPlane) * vertex.z + 0.5f * (farClipPlane + nearClipPlane);
+        return vertex;
+    }
+
+    void DrawPoint()
+    {
+        Vertex p = new Vertex
+        {
+            posInObjectSpace = new Appdata(MyVector3.zero, new MyVector2())
+        };
+        p.posInClipSpace = Vert(p.posInObjectSpace);
+        if (CheckVertex(p))
+        {
+            p.posInScreenSpace = CalPosInScreenSpace(p.posInClipSpace.vertex);
+            int x = Mathf.RoundToInt(p.posInScreenSpace.x);
+            int y = Mathf.RoundToInt(p.posInScreenSpace.y);
+            for (int i = 0; i < ScreenWidth; i++)
+            {
+                for (int j = 0; j < ScreenHeight; j++)
+                {
+                    if (Mathf.Abs(i - x) + Mathf.Abs(j - y) < 10)
+                    target.SetPixel(i, j, Color.white);
+                }
+            }
+        }
+    }
+
+    void DrawTriangle(MyTriangle triangle)
+    {
+        triangle.p1.posInClipSpace = Vert(triangle.p1.posInObjectSpace);
+        triangle.p2.posInClipSpace = Vert(triangle.p2.posInObjectSpace);
+        triangle.p2.posInClipSpace = Vert(triangle.p3.posInObjectSpace);
+    }
+
+    V2f Vert(Appdata i)
+    {
+        V2f output = new V2f();
+        output.vertex = mvp * i.vertex;
+        output.uv = i.uv;
+        return output;
+    }
+
     void Update()
     {
-        MyMatrix4x4 mvp = GetProjectionMatrix() * GetViewMatrix() * MyMatrix4x4.FromTransform(myMeshTran);
-        MyVector3 screenPoint = mvp.MultiplyPoint(new MyVector3());
-        bool needShow = Mathf.Abs(screenPoint.x) <= 1
-                     && Mathf.Abs(screenPoint.y) <= 1
-                     && Mathf.Abs(screenPoint.z) <= 1;
-        screenPoint.x += 1;
-        screenPoint.x /= 2;
-        screenPoint.y += 1;
-        screenPoint.y /= 2;
-        int x = Mathf.RoundToInt(screenPoint.x * ScreenWidth);
-        int y = Mathf.RoundToInt(screenPoint.y * ScreenHeight);
+        mvp = GetProjectionMatrix() * GetViewMatrix() * MyMatrix4x4.FromTransform(myMesh.transform);
+        ClearScreen();
+        //DrawMesh();
+        DrawPoint();
+        target.Apply();
+    }
+
+    void ClearScreen()
+    {
         for (int i = 0; i < ScreenWidth; i++)
         {
             for (int j = 0; j < ScreenHeight; j++)
             {
-                if (needShow && Mathf.Abs(i - x) + Mathf.Abs(j - y) < 10)
-                    target.SetPixel(i, j, Color.white);
-                else
-                    target.SetPixel(i, j, Color.grey);
+                target.SetPixel(i, j, clearColor);
             }
         }
-        target.Apply();
     }
 
     public MyMatrix4x4 GetViewMatrix()

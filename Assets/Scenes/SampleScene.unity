@@ -159,7 +159,8 @@ MonoBehaviour:
   ScreenWidth: 800
   ScreenHeight: 450
   rawImage: {fileID: 1198676867}
-  myMeshTran: {fileID: 807736977}
+  clearColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  myMesh: {fileID: 807736976}
 --- !u!4 &146379111
 Transform:
   m_ObjectHideFlags: 0
@@ -248,6 +249,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6c87038a7872cdd4bb9f147699c639a3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  triangles: 
 --- !u!4 &807736977
 Transform:
   m_ObjectHideFlags: 0
@@ -310,7 +312,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 807736975}
-  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+  m_Mesh: {fileID: 0}
 --- !u!1 &1198676865
 GameObject:
   m_ObjectHideFlags: 0

@@ -2,6 +2,20 @@ using UnityEngine;
 
 public static class TestHelper
 {
+    #region Vector2
+
+    public static MyVector2 ToMyVector2(this Vector2 vector2)
+    {
+        return new MyVector2(vector2.x, vector2.y);
+    }
+
+    public static Vector2 ToVector2(this MyVector2 vector2)
+    {
+        return new Vector2(vector2.u, vector2.v);
+    }
+
+    #endregion
+
     #region Vector3
 
     public static MyVector3 ToMyVector3(this Vector3 vector3)
