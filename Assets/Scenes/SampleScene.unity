@@ -161,6 +161,7 @@ MonoBehaviour:
   rawImage: {fileID: 1198676867}
   clearColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   myMesh: {fileID: 807736976}
+  dLight: {fileID: 546964113}
 --- !u!4 &146379111
 Transform:
   m_ObjectHideFlags: 0

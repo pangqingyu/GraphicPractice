@@ -16,6 +16,8 @@ public class MyCamera : MonoBehaviour
     Color clearColor = Color.gray;
     [SerializeField]
     MyMesh myMesh;
+    [SerializeField]
+    Transform dLight;
 
     Texture2D target;
     MyMatrix4x4 mvp;
@@ -201,11 +203,22 @@ public class MyCamera : MonoBehaviour
         return result.Normalize();
     }
 
+    MyVector3 WorldSpaceLightDir(MyVector4 vertex)
+    {
+        MyVector3 lightDir;
+        MyVector3 angles = (dLight.eulerAngles * Mathf.Deg2Rad).ToMyVector3();
+        lightDir.x = Mathf.Cos(angles.x) * Mathf.Sin(angles.y) * -1;
+        lightDir.y = Mathf.Sin(angles.x);
+        lightDir.z = Mathf.Cos(angles.x) * Mathf.Cos(angles.y) * -1;
+        return lightDir;
+    }
+
     V2f Vert(Appdata i)
     {
         V2f output = new V2f();
         output.vertex = mvp * i.vertex;
         MyVector3 N = UnityObjectToWorldNormal(i.normal);
+        MyVector3 L = WorldSpaceLightDir(i.vertex);
         output.uv = i.uv;
         output.color = Random.ColorHSV();
         return output;
