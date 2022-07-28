@@ -19,6 +19,7 @@ public class MyCamera : MonoBehaviour
 
     Texture2D target;
     MyMatrix4x4 mvp;
+    MyMatrix4x4 worldToObjectMatrix;
 
     void Awake()
     {
@@ -57,6 +58,7 @@ public class MyCamera : MonoBehaviour
 
     void DrawMesh()
     {
+        worldToObjectMatrix = MyMatrix4x4.WorldToObject(myMesh.transform);
         for (int i = 0; i < myMesh.triangles.Length; i += 3)
         {
             MyTriangle myTriangle = new MyTriangle
@@ -190,10 +192,20 @@ public class MyCamera : MonoBehaviour
         DrawLine(triangle.p3, triangle.p1);
     }
 
+    MyVector3 UnityObjectToWorldNormal(MyVector3 normal)
+    {
+        MyVector3 result;
+        result.x = normal.x * worldToObjectMatrix.m00 + normal.y * worldToObjectMatrix.m10 + normal.z * worldToObjectMatrix.m20;
+        result.y = normal.x * worldToObjectMatrix.m01 + normal.y * worldToObjectMatrix.m11 + normal.z * worldToObjectMatrix.m21;
+        result.z = normal.x * worldToObjectMatrix.m02 + normal.y * worldToObjectMatrix.m12 + normal.z * worldToObjectMatrix.m22;
+        return result.Normalize();
+    }
+
     V2f Vert(Appdata i)
     {
         V2f output = new V2f();
         output.vertex = mvp * i.vertex;
+        MyVector3 N = UnityObjectToWorldNormal(i.normal);
         output.uv = i.uv;
         output.color = Random.ColorHSV();
         return output;
@@ -201,7 +213,7 @@ public class MyCamera : MonoBehaviour
 
     void Update()
     {
-        mvp = GetProjectionMatrix() * GetViewMatrix() * MyMatrix4x4.FromTransform(myMesh.transform);
+        mvp = GetProjectionMatrix() * GetViewMatrix() * MyMatrix4x4.ObjectToWorld(myMesh.transform);
         ClearScreen();
         DrawMesh();
         //DrawPoint(new Vertex

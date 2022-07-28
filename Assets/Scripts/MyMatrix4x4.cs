@@ -79,12 +79,21 @@ public struct MyMatrix4x4
         return FromPosition(pos) * FromRotation(r) * FromScale(s);
     }
 
-    public static MyMatrix4x4 FromTransform(Transform t)
+    public static MyMatrix4x4 ObjectToWorld(Transform t)
     {
         MyVector3 pos = t.position.ToMyVector3();
         MyVector3 r = t.eulerAngles.ToMyVector3();
-        MyVector3 s = t.localScale.ToMyVector3();
+        MyVector3 s = t.lossyScale.ToMyVector3();
         return TRS(pos, r, s);
+    }
+
+    public static MyMatrix4x4 WorldToObject(Transform t)
+    {
+        return FromScale(new MyVector3(1f / t.lossyScale.x, 1f / t.lossyScale.y, 1f / t.lossyScale.z))
+             * FromRotation(new MyVector3(0, 0, -t.eulerAngles.z))
+             * FromRotation(new MyVector3(-t.eulerAngles.x, 0, 0))
+             * FromRotation(new MyVector3(0, -t.eulerAngles.y, 0))
+             * FromPosition((-t.position).ToMyVector3());
     }
 
     public static MyMatrix4x4 operator *(MyMatrix4x4 lhs, MyMatrix4x4 rhs)

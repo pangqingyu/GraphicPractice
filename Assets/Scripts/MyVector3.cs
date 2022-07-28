@@ -50,4 +50,10 @@ public struct MyVector3
     {
         return new MyVector3(a.x / d, a.y / d, a.z / d);
     }
+
+    public MyVector3 Normalize()
+    {
+        float magnitude = (float)System.Math.Sqrt(x * x + y * y + z * z);
+        return new MyVector3(x / magnitude, y / magnitude, z / magnitude);
+    }
 }
