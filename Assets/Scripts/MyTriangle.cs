@@ -12,11 +12,13 @@ public struct MyVector2
 public struct Appdata
 {
     public MyVector4 vertex;
+    public MyVector3 normal;
     public MyVector2 uv;
 
-    public Appdata(MyVector3 pos, MyVector2 uv)
+    public Appdata(MyVector3 pos, MyVector3 normal, MyVector2 uv)
     {
         vertex = new MyVector4(pos, 1f);
+        this.normal = normal;
         this.uv = uv;
     }
 };

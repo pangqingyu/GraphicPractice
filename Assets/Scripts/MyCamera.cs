@@ -63,15 +63,21 @@ public class MyCamera : MonoBehaviour
             {
                 p1 = new Vertex
                 {
-                    posInObjectSpace = new Appdata(myMesh.vertices[myMesh.triangles[i]], myMesh.uvs[myMesh.triangles[i]])
+                    posInObjectSpace = new Appdata(myMesh.vertices[myMesh.triangles[i]],
+                                                   myMesh.normals[myMesh.triangles[i]],
+                                                   myMesh.uvs[myMesh.triangles[i]])
                 },
                 p2 = new Vertex
                 {
-                    posInObjectSpace = new Appdata(myMesh.vertices[myMesh.triangles[i + 1]], myMesh.uvs[myMesh.triangles[i + 1]])
+                    posInObjectSpace = new Appdata(myMesh.vertices[myMesh.triangles[i + 1]],
+                                                   myMesh.normals[myMesh.triangles[i + 1]],
+                                                   myMesh.uvs[myMesh.triangles[i + 1]])
                 },
                 p3 = new Vertex
                 {
-                    posInObjectSpace = new Appdata(myMesh.vertices[myMesh.triangles[i + 2]], myMesh.uvs[myMesh.triangles[i + 2]])
+                    posInObjectSpace = new Appdata(myMesh.vertices[myMesh.triangles[i + 2]],
+                                                   myMesh.normals[myMesh.triangles[i + 2]],
+                                                   myMesh.uvs[myMesh.triangles[i + 2]])
                 }
             };
             DrawTriangle(myTriangle);
