@@ -141,7 +141,11 @@ public class MyCamera : MonoBehaviour
                 float x = (x21 * i + c) / y21;
                 int xInt = Mathf.RoundToInt(x);
                 if (xInt >= 0 && xInt < ScreenWidth)
-                    target.SetPixel(xInt, i, Color.white);
+                {
+                    float t = Mathf.InverseLerp(vertex1.posInScreenSpace.y, vertex2.posInScreenSpace.y, i);
+                    Color color = Color.Lerp(vertex1.color, vertex2.color, t);
+                    target.SetPixel(xInt, i, color);
+                }
             }
         }
         else
@@ -156,7 +160,11 @@ public class MyCamera : MonoBehaviour
                 float y = (y21 * i - c) / x21;
                 int yInt = Mathf.RoundToInt(y);
                 if (yInt >= 0 && yInt < ScreenHeight)
-                    target.SetPixel(i, yInt, Color.white);
+                {
+                    float t = Mathf.InverseLerp(vertex1.posInScreenSpace.x, vertex2.posInScreenSpace.x, i);
+                    Color color = Color.Lerp(vertex1.color, vertex2.color, t);
+                    target.SetPixel(i, yInt, color);
+                }
             }
         }
     }
@@ -170,6 +178,10 @@ public class MyCamera : MonoBehaviour
         triangle.p1.posInScreenSpace = CalPosInScreenSpace(triangle.p1.posInClipSpace.vertex);
         triangle.p2.posInScreenSpace = CalPosInScreenSpace(triangle.p2.posInClipSpace.vertex);
         triangle.p3.posInScreenSpace = CalPosInScreenSpace(triangle.p3.posInClipSpace.vertex);
+
+        triangle.p1.color = Random.ColorHSV();
+        triangle.p2.color = Random.ColorHSV();
+        triangle.p3.color = Random.ColorHSV();
 
         DrawLine(triangle.p1, triangle.p2);
         DrawLine(triangle.p2, triangle.p3);

@@ -1,10 +1,5 @@
 using UnityEngine;
 
-public struct MyColor
-{
-    public float r, g, b, a;
-};
-
 public struct MyVector2
 {
     public float u, v;
@@ -30,6 +25,7 @@ public struct V2f
 {
     public MyVector4 vertex;
     public MyVector2 uv;
+    public Color color;
 };
 
 public class Vertex
@@ -37,6 +33,7 @@ public class Vertex
     public Appdata posInObjectSpace;
     public V2f posInClipSpace;
     public MyVector4 posInScreenSpace;
+    public Color color;
 }
 
 public class MyTriangle
