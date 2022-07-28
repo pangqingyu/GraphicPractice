@@ -206,7 +206,7 @@ public class MyCamera : MonoBehaviour
         DrawMesh();
         //DrawPoint(new Vertex
         //{
-        //    posInObjectSpace = new Appdata(MyVector3.zero, new MyVector2())
+        //    posInObjectSpace = new Appdata(MyVector3.zero, new MyVector3(), new MyVector2())
         //});
         target.Apply();
     }
