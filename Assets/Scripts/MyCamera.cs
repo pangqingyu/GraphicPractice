@@ -143,7 +143,7 @@ public class MyCamera : MonoBehaviour
                 if (xInt >= 0 && xInt < ScreenWidth)
                 {
                     float t = Mathf.InverseLerp(vertex1.posInScreenSpace.y, vertex2.posInScreenSpace.y, i);
-                    Color color = Color.Lerp(vertex1.color, vertex2.color, t);
+                    Color color = Color.Lerp(vertex1.posInClipSpace.color, vertex2.posInClipSpace.color, t);
                     target.SetPixel(xInt, i, color);
                 }
             }
@@ -162,7 +162,7 @@ public class MyCamera : MonoBehaviour
                 if (yInt >= 0 && yInt < ScreenHeight)
                 {
                     float t = Mathf.InverseLerp(vertex1.posInScreenSpace.x, vertex2.posInScreenSpace.x, i);
-                    Color color = Color.Lerp(vertex1.color, vertex2.color, t);
+                    Color color = Color.Lerp(vertex1.posInClipSpace.color, vertex2.posInClipSpace.color, t);
                     target.SetPixel(i, yInt, color);
                 }
             }
@@ -179,10 +179,6 @@ public class MyCamera : MonoBehaviour
         triangle.p2.posInScreenSpace = CalPosInScreenSpace(triangle.p2.posInClipSpace.vertex);
         triangle.p3.posInScreenSpace = CalPosInScreenSpace(triangle.p3.posInClipSpace.vertex);
 
-        triangle.p1.color = Random.ColorHSV();
-        triangle.p2.color = Random.ColorHSV();
-        triangle.p3.color = Random.ColorHSV();
-
         DrawLine(triangle.p1, triangle.p2);
         DrawLine(triangle.p2, triangle.p3);
         DrawLine(triangle.p3, triangle.p1);
@@ -193,6 +189,7 @@ public class MyCamera : MonoBehaviour
         V2f output = new V2f();
         output.vertex = mvp * i.vertex;
         output.uv = i.uv;
+        output.color = Random.ColorHSV();
         return output;
     }
 

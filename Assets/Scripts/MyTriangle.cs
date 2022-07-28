@@ -33,7 +33,6 @@ public class Vertex
     public Appdata posInObjectSpace;
     public V2f posInClipSpace;
     public MyVector4 posInScreenSpace;
-    public Color color;
 }
 
 public class MyTriangle
