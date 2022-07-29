@@ -45,8 +45,6 @@ Shader "CG/Test"
 
             fixed4 frag (v2f i) : SV_Target
             {
-                float maxV = max(i.color.r, max(i.color.g, i.color.b));
-                i.color = i.color >= maxV;
                 return i.color;
             }
             ENDCG

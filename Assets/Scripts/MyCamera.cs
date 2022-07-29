@@ -204,13 +204,8 @@ public class MyCamera : MonoBehaviour
             {
                 float t = Mathf.InverseLerp(line.left, line.right, i);
                 Color color = Color.Lerp(line.leftVertex.posInClipSpace.color, line.rightVertex.posInClipSpace.color, t);
-                if (color.r == color.maxColorComponent)
-                    color = Color.red;
-                else if (color.g == color.maxColorComponent)
-                    color = Color.green;
-                else
-                    color = Color.blue;
-                target.SetPixel(i, line.y, color);
+                float rhw = Mathf.Lerp(line.leftVertex.rhw, line.rightVertex.rhw, t);
+                target.SetPixel(i, line.y, color / rhw);
                 //target.SetPixel(i, line.y, Color.blue);
             }
         }
@@ -225,6 +220,10 @@ public class MyCamera : MonoBehaviour
         triangle.p1.posInScreenSpace = CalPosInScreenSpace(triangle.p1.posInClipSpace.vertex);
         triangle.p2.posInScreenSpace = CalPosInScreenSpace(triangle.p2.posInClipSpace.vertex);
         triangle.p3.posInScreenSpace = CalPosInScreenSpace(triangle.p3.posInClipSpace.vertex);
+
+        triangle.p1.Initrhw();
+        triangle.p2.Initrhw();
+        triangle.p3.Initrhw();
     }
 
     void DrawWireTriangle(MyTriangle triangle)

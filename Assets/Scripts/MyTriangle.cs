@@ -8,6 +8,11 @@ public struct MyVector2
         this.u = u; this.v = v;
     }
 
+    public static MyVector2 operator *(MyVector2 a, float b)
+    {
+        return new MyVector2(a.u * b, a.v * b);
+    }
+
     public static MyVector2 Lerp(MyVector2 a, MyVector2 b, float t)
     {
         return new MyVector2(a.u + (b.u - a.u) * t, a.v + (b.v - a.v) * t);
@@ -56,12 +61,21 @@ public class Vertex
     public Appdata posInObjectSpace;
     public V2f posInClipSpace;
     public MyVector4 posInScreenSpace;
+    public float rhw;
     public static Vertex Lerp(Vertex a, Vertex b, float t)
     {
         Vertex v = new Vertex();
         v.posInClipSpace = V2f.Lerp(a.posInClipSpace, b.posInClipSpace, t);
         v.posInScreenSpace = MyVector4.Lerp(a.posInScreenSpace, b.posInScreenSpace, t);
+        v.rhw = a.rhw + (b.rhw - a.rhw) * t;
         return v;
+    }
+
+    public void Initrhw()
+    {
+        rhw = 1f / posInClipSpace.vertex.w;
+        posInClipSpace.uv *= rhw;
+        posInClipSpace.color *= rhw;
     }
 }
 
