@@ -69,6 +69,13 @@ public class MyCamera : MonoBehaviour
             || CheckVertex(vertex2);
     }
 
+    bool CheckTriangle(MyTriangle triangle)
+    {
+        return CheckVertex(triangle.p1)
+            || CheckVertex(triangle.p2)
+            || CheckVertex(triangle.p3);
+    }
+
     void DrawMesh()
     {
         worldToObjectMatrix = MyMatrix4x4.WorldToObject(myMesh.transform);
@@ -241,6 +248,9 @@ public class MyCamera : MonoBehaviour
     void DrawTriangle(MyTriangle triangle)
     {
         InitDrawTriangle(triangle);
+
+        if (!CheckTriangle(triangle))
+            return;
 
         MyVector3 v12 = triangle.p1.posInScreenSpace;
         v12 -= (MyVector3)triangle.p2.posInScreenSpace;
