@@ -17,8 +17,17 @@ public class MyCamera : MonoBehaviour
     [SerializeField]
     MyMesh myMesh;
     [SerializeField]
-    Transform dLight;
+    Light dLight;
+    [SerializeField]
+    Color _DiffuseColor = new Color(1f, 1f, 1f, 1f);
+    [SerializeField]
+    Color _SpecularColor = new Color(0.7f, 0.7f, 0.7f, 1f);
+    [SerializeField]
+    Color _AmbientColor = new Color(0.1f, 0.1f, 0.1f, 1f);
+    [SerializeField]
+    float _Shininess = 10f;
 
+    Color _LightColor;
     Texture2D target;
     MyMatrix4x4 mvp;
     MyMatrix4x4 worldToObjectMatrix;
@@ -206,11 +215,17 @@ public class MyCamera : MonoBehaviour
     MyVector3 WorldSpaceLightDir(MyVector4 vertex)
     {
         MyVector3 lightDir;
-        MyVector3 angles = (dLight.eulerAngles * Mathf.Deg2Rad).ToMyVector3();
+        MyVector3 angles = (dLight.transform.eulerAngles * Mathf.Deg2Rad).ToMyVector3();
         lightDir.x = Mathf.Cos(angles.x) * Mathf.Sin(angles.y) * -1;
         lightDir.y = Mathf.Sin(angles.x);
         lightDir.z = Mathf.Cos(angles.x) * Mathf.Cos(angles.y) * -1;
         return lightDir;
+    }
+
+    MyVector3 WorldSpaceViewDir(MyVector4 vertex)
+    {
+        MyVector3 viewDir = transform.position.ToMyVector3() - MyMatrix4x4.ObjectToWorld(myMesh.transform) * vertex;
+        return viewDir.Normalize();
     }
 
     V2f Vert(Appdata i)
@@ -219,13 +234,19 @@ public class MyCamera : MonoBehaviour
         output.vertex = mvp * i.vertex;
         MyVector3 N = UnityObjectToWorldNormal(i.normal);
         MyVector3 L = WorldSpaceLightDir(i.vertex);
+        MyVector3 V = WorldSpaceViewDir(i.vertex);
+        MyVector3 H = ((L + V) / 2).Normalize();
         output.uv = i.uv;
-        output.color = Random.ColorHSV();
+        Color _colord = Mathf.Max(MyVector3.Dot(L, N), 0) * _DiffuseColor * _LightColor;
+        Color _colora = _AmbientColor * _LightColor;
+        Color _colors = Mathf.Pow(Mathf.Max(MyVector3.Dot(N, H), 0), _Shininess) * _SpecularColor * _LightColor;
+        output.color = _colord + _colora + _colors;
         return output;
     }
 
     void Update()
     {
+        _LightColor = dLight.color;
         mvp = GetProjectionMatrix() * GetViewMatrix() * MyMatrix4x4.ObjectToWorld(myMesh.transform);
         ClearScreen();
         DrawMesh();
