@@ -14,12 +14,14 @@ public struct Appdata
     public MyVector4 vertex;
     public MyVector3 normal;
     public MyVector2 uv;
+    public Color color;
 
     public Appdata(MyVector3 pos, MyVector3 normal, MyVector2 uv)
     {
         vertex = new MyVector4(pos, 1f);
         this.normal = normal;
         this.uv = uv;
+        color = Color.clear;
     }
 };
 

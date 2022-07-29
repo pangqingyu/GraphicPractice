@@ -53,12 +53,10 @@ Shader "CG/BlinnPhongGouraud"
                 float3 N = normalize(UnityObjectToWorldNormal(v.normal));
                 float3 H = normalize((L + V) / 2);
 
-                fixed4 ambient = UNITY_LIGHTMODEL_AMBIENT;
                 fixed4 _colord = max(dot(L, N), 0) * _DiffuseColor * _LightColor0;
                 fixed4 _colora = _AmbientColor * _LightColor0;
                 fixed4 _colors = pow(max(dot(N, H), 0), _Shininess) * _SpecularColor * _LightColor0;
                 o.color = _colord + _colora + _colors;
-                o.color += ambient;
                 return o;
             }
 

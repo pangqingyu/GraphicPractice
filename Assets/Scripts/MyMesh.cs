@@ -7,6 +7,7 @@ public class MyMesh : MonoBehaviour
     public int[] triangles;
     public MyVector2[] uvs;
     public MyVector3[] normals;
+    public Color[] colors;
 
     void Awake()
     {
@@ -29,6 +30,18 @@ public class MyMesh : MonoBehaviour
             {
                 normals[i] = mesh.normals[i].ToMyVector3();
             }
+            if (mesh.colors.Length == mesh.vertices.Length)
+            {
+                colors = mesh.colors;
+            }
+            else
+            {
+                colors = new Color[mesh.vertices.Length];
+                for (int i = 0; i < mesh.vertices.Length; i++)
+                {
+                    colors[i] = Color.white;
+                }
+            }
         }
         else
         {
@@ -36,13 +49,15 @@ public class MyMesh : MonoBehaviour
             triangles = new int[] { 0, 1, 2 };
             uvs = new MyVector2[] { new MyVector2(0f, 0f), new MyVector2(0f, 1f), new MyVector2(1f, 0f) };
             normals = new MyVector3[] { MyVector3.forward * -1, MyVector3.forward * -1, MyVector3.forward * -1 };
+            colors = new Color[] { Color.red, Color.green, Color.blue };
 
             mesh = new Mesh
             {
                 vertices = new Vector3[] { Vector3.zero, Vector3.up, Vector3.right },
                 triangles = triangles,
                 uv = new Vector2[] { Vector2.zero, Vector2.up, Vector2.right },
-                normals = new Vector3[] { Vector3.forward * -1, Vector3.forward * -1, Vector3.forward * -1 }
+                normals = new Vector3[] { Vector3.forward * -1, Vector3.forward * -1, Vector3.forward * -1 },
+                colors = colors
             };
             GetComponent<MeshFilter>().mesh = mesh;
         }
