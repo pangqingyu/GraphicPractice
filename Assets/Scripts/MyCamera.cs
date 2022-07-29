@@ -62,13 +62,6 @@ public class MyCamera : MonoBehaviour
             || CheckVertex(vertex2);
     }
 
-    bool CheckTriangle(MyTriangle triangle)
-    {
-        return CheckVertex(triangle.p1)
-            || CheckVertex(triangle.p2)
-            || CheckVertex(triangle.p3);
-    }
-
     void DrawMesh()
     {
         worldToObjectMatrix = MyMatrix4x4.WorldToObject(myMesh.transform);
@@ -377,7 +370,6 @@ public class MyCamera : MonoBehaviour
         Color _colora = _AmbientColor * _LightColor;
         Color _colors = Mathf.Pow(Mathf.Max(MyVector3.Dot(N, H), 0), _Shininess) * _SpecularColor * _LightColor;
         output.color = _colord + _colora + _colors;
-        output.color = i.color;
         return output;
     }
 
