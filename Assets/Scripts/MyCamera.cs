@@ -28,15 +28,22 @@ public class MyCamera : MonoBehaviour
     float _Shininess = 10f;
     [SerializeField]
     bool drawWire = false;
-
+    [SerializeField]
+    bool ZTest = false;
     Color _LightColor;
     Texture2D target;
+    float[][] Zbuffer;
     MyMatrix4x4 mvp;
     MyMatrix4x4 worldToObjectMatrix;
 
     void Awake()
     {
         target = new Texture2D(ScreenWidth, ScreenHeight, TextureFormat.RGBA32, false);
+        Zbuffer = new float[ScreenWidth][];
+        for (int i = 0; i < ScreenWidth; i++)
+        {
+            Zbuffer[i] = new float[ScreenHeight];
+        }
         rawImage.texture = target;
         if (TryGetComponent<Camera>(out var cam))
         {
@@ -196,10 +203,13 @@ public class MyCamera : MonoBehaviour
             for (int i = Mathf.Max(line.left, 0); i <= Mathf.Min(line.right, ScreenWidth - 1); i++)
             {
                 float t = Mathf.InverseLerp(line.left, line.right, i);
-                Color color = Color.Lerp(line.leftVertex.posInClipSpace.color, line.rightVertex.posInClipSpace.color, t);
                 float rhw = Mathf.Lerp(line.leftVertex.rhw, line.rightVertex.rhw, t);
-                target.SetPixel(i, line.y, color / rhw);
-                //target.SetPixel(i, line.y, Color.blue);
+                if (!ZTest || rhw >= Zbuffer[i][line.y])
+                {
+                    Color color = Color.Lerp(line.leftVertex.posInClipSpace.color, line.rightVertex.posInClipSpace.color, t);
+                    target.SetPixel(i, line.y, color / rhw);
+                    Zbuffer[i][line.y] = rhw;
+                }
             }
         }
     }
@@ -237,8 +247,8 @@ public class MyCamera : MonoBehaviour
         MyVector3 v13 = triangle.p1.posInScreenSpace;
         v13 -= (MyVector3)triangle.p3.posInScreenSpace;
         MyVector3 n = MyVector3.Cross(v12, v13);
-        if (n.z > 0f)
-            return;
+        //if (n.z > 0f)
+        //    return;
 
         Vertex temp;
         // swap p1 and p2 if p1 is higher than p2
@@ -392,6 +402,7 @@ public class MyCamera : MonoBehaviour
         {
             for (int j = 0; j < ScreenHeight; j++)
             {
+                Zbuffer[i][j] = 0;
                 target.SetPixel(i, j, clearColor);
             }
         }
