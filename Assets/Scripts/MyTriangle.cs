@@ -30,6 +30,11 @@ public struct V2f
     public Color color;
 };
 
+public struct ScanLine
+{
+    public int left, y, right;
+}
+
 public class Vertex
 {
     public Appdata posInObjectSpace;

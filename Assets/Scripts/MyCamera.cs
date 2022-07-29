@@ -26,6 +26,8 @@ public class MyCamera : MonoBehaviour
     Color _AmbientColor = new Color(0.1f, 0.1f, 0.1f, 1f);
     [SerializeField]
     float _Shininess = 10f;
+    [SerializeField]
+    bool drawWire = false;
 
     Color _LightColor;
     Texture2D target;
@@ -93,7 +95,10 @@ public class MyCamera : MonoBehaviour
                                                    myMesh.uvs[myMesh.triangles[i + 2]])
                 }
             };
-            DrawTriangle(myTriangle);
+            if (drawWire)
+                DrawWireTriangle(myTriangle);
+            else
+                DrawTriangle(myTriangle);
         }
     }
 
@@ -188,7 +193,18 @@ public class MyCamera : MonoBehaviour
         }
     }
 
-    void DrawTriangle(MyTriangle triangle)
+    void DrawScanLine(ScanLine line)
+    {
+        if (0 <= line.y && line.y < ScreenHeight)
+        {
+            for (int i = Mathf.Max(line.left, 0); i <= Mathf.Min(line.right, ScreenWidth - 1); i++)
+            {
+                target.SetPixel(i, line.y, Color.blue);
+            }
+        }
+    }
+
+    void InitDrawTriangle(MyTriangle triangle)
     {
         triangle.p1.posInClipSpace = Vert(triangle.p1.posInObjectSpace);
         triangle.p2.posInClipSpace = Vert(triangle.p2.posInObjectSpace);
@@ -197,10 +213,84 @@ public class MyCamera : MonoBehaviour
         triangle.p1.posInScreenSpace = CalPosInScreenSpace(triangle.p1.posInClipSpace.vertex);
         triangle.p2.posInScreenSpace = CalPosInScreenSpace(triangle.p2.posInClipSpace.vertex);
         triangle.p3.posInScreenSpace = CalPosInScreenSpace(triangle.p3.posInClipSpace.vertex);
+    }
+
+    void DrawWireTriangle(MyTriangle triangle)
+    {
+        InitDrawTriangle(triangle);
 
         DrawLine(triangle.p1, triangle.p2);
         DrawLine(triangle.p2, triangle.p3);
         DrawLine(triangle.p3, triangle.p1);
+    }
+
+    void DrawTriangle(MyTriangle triangle)
+    {
+        InitDrawTriangle(triangle);
+
+        Vertex temp;
+        // swap p1 and p2 if p1 is higher than p2
+        if (triangle.p1.posInScreenSpace.y > triangle.p2.posInScreenSpace.y)
+        {
+            temp = triangle.p1;
+            triangle.p1 = triangle.p2;
+            triangle.p2 = temp;
+        }
+        // swap p1 and p3 if p1 is higher than p3
+        if (triangle.p1.posInScreenSpace.y > triangle.p3.posInScreenSpace.y)
+        {
+            temp = triangle.p1;
+            triangle.p1 = triangle.p3;
+            triangle.p3 = temp;
+        }
+        // swap p2 and p3 if p2 is higher than p3
+        if (triangle.p2.posInScreenSpace.y > triangle.p3.posInScreenSpace.y)
+        {
+            temp = triangle.p2;
+            triangle.p2 = triangle.p3;
+            triangle.p3 = temp;
+        }
+
+        ScanLine line = new ScanLine();
+        int top = Mathf.RoundToInt(triangle.p3.posInScreenSpace.y);
+        int middle = Mathf.RoundToInt(triangle.p2.posInScreenSpace.y);
+        int bottom = Mathf.RoundToInt(triangle.p1.posInScreenSpace.y);
+        float t;
+
+        // single line
+        if (top == bottom)
+        {
+            line.left = Mathf.RoundToInt(Mathf.Min(triangle.p1.posInScreenSpace.x, triangle.p2.posInScreenSpace.x, triangle.p3.posInScreenSpace.x));
+            line.y = top;
+            line.right = Mathf.RoundToInt(Mathf.Max(triangle.p1.posInScreenSpace.x, triangle.p2.posInScreenSpace.x, triangle.p3.posInScreenSpace.x));
+            DrawScanLine(line);
+        }
+        else
+        {
+            int x12, x13, x23;
+            for (int i = bottom; i <= top; i++)
+            {
+                line.y = i;
+                t = Mathf.InverseLerp(triangle.p1.posInScreenSpace.y, triangle.p2.posInScreenSpace.y, i);
+                x12 = Mathf.RoundToInt(Mathf.Lerp(triangle.p1.posInScreenSpace.x, triangle.p2.posInScreenSpace.x, t));
+                t = Mathf.InverseLerp(triangle.p1.posInScreenSpace.y, triangle.p3.posInScreenSpace.y, i);
+                x13 = Mathf.RoundToInt(Mathf.Lerp(triangle.p1.posInScreenSpace.x, triangle.p3.posInScreenSpace.x, t));
+                t = Mathf.InverseLerp(triangle.p2.posInScreenSpace.y, triangle.p3.posInScreenSpace.y, i);
+                x23 = Mathf.RoundToInt(Mathf.Lerp(triangle.p2.posInScreenSpace.x, triangle.p3.posInScreenSpace.x, t));
+
+                if (i < middle)
+                {
+                    line.left = Mathf.Min(x12, x13);
+                    line.right = Mathf.Max(x12, x13);
+                }
+                else
+                {
+                    line.left = Mathf.Min(x23, x13);
+                    line.right = Mathf.Max(x23, x13);
+                }
+                DrawScanLine(line);
+            }
+        }
     }
 
     MyVector3 UnityObjectToWorldNormal(MyVector3 normal)
