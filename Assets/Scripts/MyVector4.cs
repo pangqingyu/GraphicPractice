@@ -12,6 +12,16 @@ public struct MyVector4
         x = v.x; y = v.y; z = v.z; this.w = w;
     }
 
+    public static MyVector4 operator +(MyVector4 a, MyVector4 b)
+    {
+        return new MyVector4(a.x + b.x, a.y + b.y, a.z + b.z, a.w + b.w);
+    }
+
+    public static MyVector4 operator -(MyVector4 a, MyVector4 b)
+    {
+        return new MyVector4(a.x - b.x, a.y - b.y, a.z - b.z, a.w - b.w);
+    }
+
     public static MyVector4 operator *(MyVector4 a, float d)
     {
         return new MyVector4(a.x * d, a.y * d, a.z * d, a.w * d);
@@ -35,5 +45,10 @@ public struct MyVector4
     public MyVector3 ToPoint()
     {
         return new MyVector3(x / w, y / w, z / w);
+    }
+
+    public static MyVector4 Lerp(MyVector4 a, MyVector4 b, float t)
+    {
+        return a * (1f - t) + b * t;
     }
 }

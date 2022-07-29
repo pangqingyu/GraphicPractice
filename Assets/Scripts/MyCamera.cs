@@ -80,19 +80,22 @@ public class MyCamera : MonoBehaviour
                 {
                     posInObjectSpace = new Appdata(myMesh.vertices[myMesh.triangles[i]],
                                                    myMesh.normals[myMesh.triangles[i]],
-                                                   myMesh.uvs[myMesh.triangles[i]])
+                                                   myMesh.uvs[myMesh.triangles[i]],
+                                                   myMesh.colors[myMesh.triangles[i]])
                 },
                 p2 = new Vertex
                 {
                     posInObjectSpace = new Appdata(myMesh.vertices[myMesh.triangles[i + 1]],
                                                    myMesh.normals[myMesh.triangles[i + 1]],
-                                                   myMesh.uvs[myMesh.triangles[i + 1]])
+                                                   myMesh.uvs[myMesh.triangles[i + 1]],
+                                                   myMesh.colors[myMesh.triangles[i + 1]])
                 },
                 p3 = new Vertex
                 {
                     posInObjectSpace = new Appdata(myMesh.vertices[myMesh.triangles[i + 2]],
                                                    myMesh.normals[myMesh.triangles[i + 2]],
-                                                   myMesh.uvs[myMesh.triangles[i + 2]])
+                                                   myMesh.uvs[myMesh.triangles[i + 2]],
+                                                   myMesh.colors[myMesh.triangles[i + 2]])
                 }
             };
             if (drawWire)
@@ -199,7 +202,16 @@ public class MyCamera : MonoBehaviour
         {
             for (int i = Mathf.Max(line.left, 0); i <= Mathf.Min(line.right, ScreenWidth - 1); i++)
             {
-                target.SetPixel(i, line.y, Color.blue);
+                float t = Mathf.InverseLerp(line.left, line.right, i);
+                Color color = Color.Lerp(line.leftVertex.posInClipSpace.color, line.rightVertex.posInClipSpace.color, t);
+                if (color.r == color.maxColorComponent)
+                    color = Color.red;
+                else if (color.g == color.maxColorComponent)
+                    color = Color.green;
+                else
+                    color = Color.blue;
+                target.SetPixel(i, line.y, color);
+                //target.SetPixel(i, line.y, Color.blue);
             }
         }
     }
@@ -229,9 +241,9 @@ public class MyCamera : MonoBehaviour
         InitDrawTriangle(triangle);
 
         MyVector3 v12 = triangle.p1.posInScreenSpace;
-        v12 -= triangle.p2.posInScreenSpace;
+        v12 -= (MyVector3)triangle.p2.posInScreenSpace;
         MyVector3 v13 = triangle.p1.posInScreenSpace;
-        v13 -= triangle.p3.posInScreenSpace;
+        v13 -= (MyVector3)triangle.p3.posInScreenSpace;
         MyVector3 n = MyVector3.Cross(v12, v13);
         if (n.z > 0f)
             return;
@@ -271,7 +283,7 @@ public class MyCamera : MonoBehaviour
             line.left = Mathf.RoundToInt(Mathf.Min(triangle.p1.posInScreenSpace.x, triangle.p2.posInScreenSpace.x, triangle.p3.posInScreenSpace.x));
             line.y = top;
             line.right = Mathf.RoundToInt(Mathf.Max(triangle.p1.posInScreenSpace.x, triangle.p2.posInScreenSpace.x, triangle.p3.posInScreenSpace.x));
-            DrawScanLine(line);
+            //DrawScanLine(line);
         }
         else
         {
@@ -281,20 +293,47 @@ public class MyCamera : MonoBehaviour
                 line.y = i;
                 t = Mathf.InverseLerp(triangle.p1.posInScreenSpace.y, triangle.p2.posInScreenSpace.y, i);
                 x12 = Mathf.RoundToInt(Mathf.Lerp(triangle.p1.posInScreenSpace.x, triangle.p2.posInScreenSpace.x, t));
+                Vertex p12 = Vertex.Lerp(triangle.p1, triangle.p2, t);
                 t = Mathf.InverseLerp(triangle.p1.posInScreenSpace.y, triangle.p3.posInScreenSpace.y, i);
                 x13 = Mathf.RoundToInt(Mathf.Lerp(triangle.p1.posInScreenSpace.x, triangle.p3.posInScreenSpace.x, t));
+                Vertex p13 = Vertex.Lerp(triangle.p1, triangle.p3, t);
                 t = Mathf.InverseLerp(triangle.p2.posInScreenSpace.y, triangle.p3.posInScreenSpace.y, i);
                 x23 = Mathf.RoundToInt(Mathf.Lerp(triangle.p2.posInScreenSpace.x, triangle.p3.posInScreenSpace.x, t));
+                Vertex p23 = Vertex.Lerp(triangle.p2, triangle.p3, t);
 
                 if (i < middle)
                 {
-                    line.left = Mathf.Min(x12, x13);
-                    line.right = Mathf.Max(x12, x13);
+                    if (x12 < x13)
+                    {
+                        line.left = x12;
+                        line.right = x13;
+                        line.leftVertex = p12;
+                        line.rightVertex = p13;
+                    }
+                    else
+                    {
+                        line.left = x13;
+                        line.right = x12;
+                        line.leftVertex = p13;
+                        line.rightVertex = p12;
+                    }
                 }
                 else
                 {
-                    line.left = Mathf.Min(x23, x13);
-                    line.right = Mathf.Max(x23, x13);
+                    if (x13 < x23)
+                    {
+                        line.left = x13;
+                        line.right = x23;
+                        line.leftVertex = p13;
+                        line.rightVertex = p23;
+                    }
+                    else
+                    {
+                        line.left = x23;
+                        line.right = x13;
+                        line.leftVertex = p23;
+                        line.rightVertex = p13;
+                    }
                 }
                 DrawScanLine(line);
             }
@@ -322,7 +361,7 @@ public class MyCamera : MonoBehaviour
 
     MyVector3 WorldSpaceViewDir(MyVector4 vertex)
     {
-        MyVector3 viewDir = transform.position.ToMyVector3() - MyMatrix4x4.ObjectToWorld(myMesh.transform) * vertex;
+        MyVector3 viewDir = transform.position.ToMyVector3() - (MyVector3)(MyMatrix4x4.ObjectToWorld(myMesh.transform) * vertex);
         return viewDir.Normalize();
     }
 
@@ -339,6 +378,7 @@ public class MyCamera : MonoBehaviour
         Color _colora = _AmbientColor * _LightColor;
         Color _colors = Mathf.Pow(Mathf.Max(MyVector3.Dot(N, H), 0), _Shininess) * _SpecularColor * _LightColor;
         output.color = _colord + _colora + _colors;
+        output.color = i.color;
         return output;
     }
 
