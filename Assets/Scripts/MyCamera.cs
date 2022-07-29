@@ -228,6 +228,14 @@ public class MyCamera : MonoBehaviour
     {
         InitDrawTriangle(triangle);
 
+        MyVector3 v12 = triangle.p1.posInScreenSpace;
+        v12 -= triangle.p2.posInScreenSpace;
+        MyVector3 v13 = triangle.p1.posInScreenSpace;
+        v13 -= triangle.p3.posInScreenSpace;
+        MyVector3 n = MyVector3.Cross(v12, v13);
+        if (n.z > 0f)
+            return;
+
         Vertex temp;
         // swap p1 and p2 if p1 is higher than p2
         if (triangle.p1.posInScreenSpace.y > triangle.p2.posInScreenSpace.y)
