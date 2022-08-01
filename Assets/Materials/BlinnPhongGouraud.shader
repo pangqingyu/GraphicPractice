@@ -2,7 +2,7 @@ Shader "CG/BlinnPhongGouraud"
 {
     Properties
     {
-        _DiffuseColor("Diffuse Color", Color) = (1, 1, 1, 1)
+        _MainTex("Texture", 2D) = "white" {}
         _SpecularColor("Specular Color", Color) = (0.7, 0.7, 0.7, 1)
         _AmbientColor("Ambient Color", Color) = (0.1, 0.1, 0.1, 1)
         _Shininess("Shininess", Range(0.1, 50)) = 10
@@ -38,7 +38,6 @@ Shader "CG/BlinnPhongGouraud"
             float4 _MainTex_ST;
 
             uniform fixed4 _LightColor0;
-            uniform fixed4 _DiffuseColor;
             uniform fixed4 _SpecularColor;
             uniform fixed4 _AmbientColor;
             uniform float _Shininess;
@@ -53,6 +52,7 @@ Shader "CG/BlinnPhongGouraud"
                 float3 N = normalize(UnityObjectToWorldNormal(v.normal));
                 float3 H = normalize((L + V) / 2);
 
+                fixed4 _DiffuseColor = tex2Dlod(_MainTex, float4(o.uv, 0, 0));
                 fixed4 _colord = max(dot(L, N), 0) * _DiffuseColor * _LightColor0;
                 fixed4 _colora = _AmbientColor * _LightColor0;
                 fixed4 _colors = pow(max(dot(N, H), 0), _Shininess) * _SpecularColor * _LightColor0;

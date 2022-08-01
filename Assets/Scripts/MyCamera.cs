@@ -19,8 +19,7 @@ public class MyCamera : MonoBehaviour
     MyMesh myMesh;
     [SerializeField]
     Light dLight;
-    [SerializeField]
-    Color _DiffuseColor = new Color(1f, 1f, 1f, 1f);
+    Texture2D _Diffuse;
     [SerializeField]
     Color _SpecularColor = new Color(0.7f, 0.7f, 0.7f, 1f);
     [SerializeField]
@@ -83,6 +82,7 @@ public class MyCamera : MonoBehaviour
     IEnumerator DrawMesh()
     {
         worldToObjectMatrix = MyMatrix4x4.WorldToObject(myMesh.transform);
+        _Diffuse = myMesh.GetComponent<MeshRenderer>().sharedMaterial.mainTexture as Texture2D;
         for (int i = 0; i < myMesh.triangles.Length; i += 3)
         {
             MyTriangle myTriangle = new MyTriangle
@@ -406,6 +406,9 @@ public class MyCamera : MonoBehaviour
         MyVector3 V = WorldSpaceViewDir(i.vertex);
         MyVector3 H = ((L + V) / 2).Normalize();
         output.uv = i.uv;
+        Color _DiffuseColor = _Diffuse.GetPixel(Mathf.RoundToInt(_Diffuse.width * output.uv.u),
+            Mathf.RoundToInt(_Diffuse.height * output.uv.v));
+
         Color _colord = Mathf.Max(MyVector3.Dot(L, N), 0) * _DiffuseColor * _LightColor;
         Color _colora = _AmbientColor * _LightColor;
         Color _colors = Mathf.Pow(Mathf.Max(MyVector3.Dot(N, H), 0), _Shininess) * _SpecularColor * _LightColor;
