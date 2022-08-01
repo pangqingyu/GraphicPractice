@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -30,11 +31,14 @@ public class MyCamera : MonoBehaviour
     bool drawWire = false;
     [SerializeField]
     bool ZTest = false;
+    [SerializeField]
+    bool drawInCoroutine = false;
     Color _LightColor;
     Texture2D target;
     float[][] Zbuffer;
     MyMatrix4x4 mvp;
     MyMatrix4x4 worldToObjectMatrix;
+    Coroutine drawMeshCoroutine;
 
     void Awake()
     {
@@ -76,7 +80,7 @@ public class MyCamera : MonoBehaviour
             || CheckVertex(triangle.p3);
     }
 
-    void DrawMesh()
+    IEnumerator DrawMesh()
     {
         worldToObjectMatrix = MyMatrix4x4.WorldToObject(myMesh.transform);
         for (int i = 0; i < myMesh.triangles.Length; i += 3)
@@ -107,9 +111,14 @@ public class MyCamera : MonoBehaviour
             };
             if (drawWire)
                 DrawWireTriangle(myTriangle);
+            else if (drawInCoroutine)
+                yield return DrawTriangle(myTriangle);
             else
-                DrawTriangle(myTriangle);
+                StartCoroutine(DrawTriangle(myTriangle));
         }
+        if (drawInCoroutine)
+            yield return new WaitForSeconds(10f);
+        drawMeshCoroutine = null;
     }
 
     MyVector4 CalPosInScreenSpace(MyVector4 vertex)
@@ -247,12 +256,12 @@ public class MyCamera : MonoBehaviour
         DrawLine(triangle.p3, triangle.p1);
     }
 
-    void DrawTriangle(MyTriangle triangle)
+    IEnumerator DrawTriangle(MyTriangle triangle)
     {
         InitDrawTriangle(triangle);
 
         if (!CheckTriangle(triangle))
-            return;
+            yield break;
 
         MyVector3 v12 = triangle.p1.posInScreenSpace;
         v12 -= (MyVector3)triangle.p2.posInScreenSpace;
@@ -406,10 +415,13 @@ public class MyCamera : MonoBehaviour
 
     void Update()
     {
-        _LightColor = dLight.color;
-        mvp = GetProjectionMatrix() * GetViewMatrix() * MyMatrix4x4.ObjectToWorld(myMesh.transform);
-        ClearScreen();
-        DrawMesh();
+        if (drawMeshCoroutine == null)
+        {
+            _LightColor = dLight.color;
+            mvp = GetProjectionMatrix() * GetViewMatrix() * MyMatrix4x4.ObjectToWorld(myMesh.transform);
+            ClearScreen();
+            drawMeshCoroutine = StartCoroutine(DrawMesh());
+        }
         //DrawPoint(new Vertex
         //{
         //    posInObjectSpace = new Appdata(MyVector3.zero, new MyVector3(), new MyVector2())
