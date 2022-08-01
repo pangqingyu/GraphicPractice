@@ -207,9 +207,11 @@ public class MyCamera : MonoBehaviour
     {
         if (0 <= line.y && line.y < ScreenHeight)
         {
-            for (int i = Mathf.Max(line.left, 0); i <= Mathf.Min(line.right, ScreenWidth - 1); i++)
+            int left = Mathf.Max(Mathf.RoundToInt(line.leftVertex.posInScreenSpace.x), 0);
+            int right = Mathf.Min(Mathf.RoundToInt(line.rightVertex.posInScreenSpace.x), ScreenWidth - 1);
+            for (int i = left; i <= right; i++)
             {
-                float t = Mathf.InverseLerp(line.left, line.right, i);
+                float t = Mathf.InverseLerp(line.leftVertex.posInScreenSpace.x, line.rightVertex.posInScreenSpace.x, i);
                 float rhw = Mathf.Lerp(line.leftVertex.rhw, line.rightVertex.rhw, t);
                 if (!ZTest || rhw >= Zbuffer[i][line.y])
                 {
@@ -292,10 +294,27 @@ public class MyCamera : MonoBehaviour
         // single line
         if (top == bottom)
         {
-            line.left = Mathf.RoundToInt(Mathf.Min(triangle.p1.posInScreenSpace.x, triangle.p2.posInScreenSpace.x, triangle.p3.posInScreenSpace.x));
             line.y = top;
-            line.right = Mathf.RoundToInt(Mathf.Max(triangle.p1.posInScreenSpace.x, triangle.p2.posInScreenSpace.x, triangle.p3.posInScreenSpace.x));
-            //DrawScanLine(line);
+            if (triangle.p1.posInScreenSpace.x < triangle.p2.posInScreenSpace.x)
+            {
+                line.leftVertex = triangle.p1;
+                line.rightVertex = triangle.p2;
+            }
+            else
+            {
+                line.leftVertex = triangle.p2;
+                line.rightVertex = triangle.p1;
+            }
+
+            if (triangle.p3.posInScreenSpace.x < line.leftVertex.posInScreenSpace.x)
+            {
+                line.leftVertex = triangle.p3;
+            }
+            else if (triangle.p3.posInScreenSpace.x > line.rightVertex.posInScreenSpace.x)
+            {
+                line.rightVertex = triangle.p3;
+            }
+            DrawScanLine(line);
         }
         else
         {
@@ -317,15 +336,11 @@ public class MyCamera : MonoBehaviour
                 {
                     if (x12 < x13)
                     {
-                        line.left = x12;
-                        line.right = x13;
                         line.leftVertex = p12;
                         line.rightVertex = p13;
                     }
                     else
                     {
-                        line.left = x13;
-                        line.right = x12;
                         line.leftVertex = p13;
                         line.rightVertex = p12;
                     }
@@ -334,15 +349,11 @@ public class MyCamera : MonoBehaviour
                 {
                     if (x13 < x23)
                     {
-                        line.left = x13;
-                        line.right = x23;
                         line.leftVertex = p13;
                         line.rightVertex = p23;
                     }
                     else
                     {
-                        line.left = x23;
-                        line.right = x13;
                         line.leftVertex = p23;
                         line.rightVertex = p13;
                     }

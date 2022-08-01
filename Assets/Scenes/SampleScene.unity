@@ -167,6 +167,7 @@ MonoBehaviour:
   _AmbientColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
   _Shininess: 10
   drawWire: 0
+  ZTest: 1
 --- !u!4 &146379111
 Transform:
   m_ObjectHideFlags: 0

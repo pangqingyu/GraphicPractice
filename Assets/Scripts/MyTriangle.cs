@@ -52,7 +52,7 @@ public struct V2f
 
 public struct ScanLine
 {
-    public int left, y, right;
+    public int y;
     public Vertex leftVertex, rightVertex;
 }
 
