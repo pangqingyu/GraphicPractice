@@ -52,17 +52,13 @@ Shader "CG/BlinnPhongGouraud"
                 float3 N = normalize(UnityObjectToWorldNormal(v.normal));
                 float3 H = normalize((L + V) / 2);
 
-                fixed4 _DiffuseColor = tex2Dlod(_MainTex, float4(o.uv, 0, 0));
-                fixed4 _colord = max(dot(L, N), 0) * _DiffuseColor * _LightColor0;
-                fixed4 _colora = _AmbientColor * _LightColor0;
-                fixed4 _colors = pow(max(dot(N, H), 0), _Shininess) * _SpecularColor * _LightColor0;
-                o.color = _colord + _colora + _colors;
+                o.color = max(dot(L, N), 0) * _LightColor0;
                 return o;
             }
 
             fixed4 frag (v2f i) : SV_Target
             {
-                return i.color;
+                return tex2D(_MainTex, i.uv) * i.color;
             }
             ENDCG
         }

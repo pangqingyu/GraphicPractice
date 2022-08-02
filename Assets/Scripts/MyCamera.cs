@@ -224,12 +224,23 @@ public class MyCamera : MonoBehaviour
                 float rhw = Mathf.Lerp(line.leftVertex.rhw, line.rightVertex.rhw, t);
                 if (!ZTest || rhw >= Zbuffer[i][line.y])
                 {
-                    Color color = Color.Lerp(line.leftVertex.posInClipSpace.color, line.rightVertex.posInClipSpace.color, t);
-                    target.SetPixel(i, line.y, color / rhw);
+                    V2f v2F = V2f.Lerp(line.leftVertex.posInClipSpace, line.rightVertex.posInClipSpace, t);
+                    Color color = Frag(v2F, rhw);
+
+                    target.SetPixel(i, line.y, color);
                     Zbuffer[i][line.y] = rhw;
                 }
             }
         }
+    }
+
+    Color Frag(V2f i, float rhw)
+    {
+        Color _DiffuseColor = _Diffuse.GetPixel(Mathf.RoundToInt(_Diffuse.width * i.uv.u / rhw),
+            Mathf.RoundToInt(_Diffuse.height * i.uv.v / rhw));
+        Color color = i.color * _DiffuseColor / rhw;
+        color.a = 1;
+        return color;
     }
 
     void InitDrawTriangle(MyTriangle triangle)
@@ -406,13 +417,8 @@ public class MyCamera : MonoBehaviour
         MyVector3 V = WorldSpaceViewDir(i.vertex);
         MyVector3 H = ((L + V) / 2).Normalize();
         output.uv = i.uv;
-        Color _DiffuseColor = _Diffuse.GetPixel(Mathf.RoundToInt(_Diffuse.width * output.uv.u),
-            Mathf.RoundToInt(_Diffuse.height * output.uv.v));
 
-        Color _colord = Mathf.Max(MyVector3.Dot(L, N), 0) * _DiffuseColor * _LightColor;
-        Color _colora = _AmbientColor * _LightColor;
-        Color _colors = Mathf.Pow(Mathf.Max(MyVector3.Dot(N, H), 0), _Shininess) * _SpecularColor * _LightColor;
-        output.color = _colord + _colora + _colors;
+        output.color = Mathf.Max(MyVector3.Dot(L, N), 0) * _LightColor;
         return output;
     }
 
